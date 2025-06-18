@@ -1,30 +1,30 @@
-# Makefile for building "cre" from main.cpp
+# Makefile for building "cre" from src/*.cpp
 
 CXX := g++
 CXXFLAGS := -Wall -Wextra -g 
 TARGET := cre
-SRCS := main.cpp \
-		 GameBoard.cpp \
-		 GameSettings.cpp \
-		 GameCell.cpp \
-		 GameCursor.cpp \
-		 GamePlayer.cpp \
-		 DisplayHandler.cpp \
-		 ExplosionHandler.cpp \
-		 ExplosionQueue.cpp \
-		 GameFrameQueue.cpp \
+SRCS := src/main.cpp \
+		 src/GameBoard.cpp \
+		 src/GameSettings.cpp \
+		 src/GameCell.cpp \
+		 src/GameCursor.cpp \
+		 src/GamePlayer.cpp \
+		 src/DisplayHandler.cpp \
+		 src/ExplosionHandler.cpp \
+		 src/ExplosionQueue.cpp \
+		 src/GameFrameQueue.cpp \
 
+SRC_DIR := src
 BUILD_DIR := build
-OBJS := $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.o))
+OBJS := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRCS))
 
 all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
-#rm -rf $(BUILD_DIR)
 
-$(BUILD_DIR)/%.o: %.cpp | $(BUILD_DIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
+$(BUILD_DIR)/%.o: src/%.cpp | $(BUILD_DIR)
+	$(CXX) $(CXXFLAGS) -c $< -o $@ 
 
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
