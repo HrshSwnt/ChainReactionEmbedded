@@ -1,6 +1,6 @@
 #include "main.hpp"
 
-GameBoard::GameBoard() : rows(0), cols(0), initialized(false) {}
+GameBoard::GameBoard() : rows(0), cols(0), initialized(false), firstRun(true), gameOver(false){}
 GameBoard::~GameBoard() = default;
 
 GameBoard& GameBoard::instance() {
@@ -23,6 +23,11 @@ void GameBoard::initialize(int r, int c, int p) {
         for (int i = 0; i < p; ++i) {
             players.emplace_back(i + 1); // Create players with IDs starting from 1
         }
+        activePlayers.clear();
+        for (int i = 0; i < p; ++i) {
+            activePlayers.push_back(&players[i]); // Add players to the active players list
+        }
+        inactivePlayers.clear(); // Clear inactive players list
         currentPlayer = 1; // Start with the first player
         board.resize(rows, vector<GameCell>(cols, GameCell()));
         for (int i = 0; i < rows; ++i) {
@@ -36,6 +41,8 @@ void GameBoard::initialize(int r, int c, int p) {
             }
         }
         initialized = true;
+        firstRun = true;
+        gameOver = false; // Reset game over state
     }
 }
 
@@ -45,7 +52,11 @@ GamePlayer* GameBoard::getCurrentPlayer(){
         std::cerr << "GameBoard not initialized.\n";
         return nullptr; // Return nullptr if not initialized
     }
-    return &players[currentPlayer - 1]; // Return the current player
+    if (currentPlayer < 1 || currentPlayer > static_cast<int>(activePlayers.size())) {
+        std::cerr << "Invalid current player index.\n";
+        return nullptr; // Return nullptr if currentPlayer is out of bounds
+    }
+    return activePlayers[currentPlayer - 1]; // Return the current player
 }
 
 void GameBoard::switchPlayer() {
@@ -54,7 +65,11 @@ void GameBoard::switchPlayer() {
         std::cerr << "GameBoard not initialized.\n";
         return;
     }
-    currentPlayer = (currentPlayer % players.size()) + 1; // Switch to the next player
+    if (firstRun && currentPlayer == GameSettings::instance().players) {
+        firstRun = false; // Set firstRun to false after the first switch
+    }
+    currentPlayer = (currentPlayer % activePlayers.size()) + 1; // Switch to the next player
+
 }
 
 
@@ -103,6 +118,17 @@ void GameBoard::drawGrid(int x, int y) {
     }
     cout << "═══╝" << endl;
     cout << "Player " << currentPlayer << "'s turn." << endl;
+    cout << endl;
+    if (inactivePlayers.size() > 0) {
+        cout << "Eliminated Players: ";
+        for (const auto& player : inactivePlayers) {
+            cout << "Player " << player->id << " (" << player->color << ") ";
+        }
+        cout << endl;
+    }
+    if (gameOver) {
+        cout << "Game Over! Player " << activePlayers[0]->id << " wins!" << endl;
+    }
 }
 
 vector<vector<string>> GameBoard::getColors() const {
@@ -125,4 +151,36 @@ vector<vector<int>> GameBoard::getLevels() const {
         }
     }
     return levels;
+}
+
+void GameBoard::GameEndCheck()  {
+    std::lock_guard<std::mutex> lock(GameBoard::mtx());
+    if (!initialized || firstRun) {
+        std::cerr << "GameBoard not initialized.\n";
+        return ; // Return false if not initialized
+    }
+    vector<GamePlayer*> newActivePlayers;
+    vector<GamePlayer*> newInactivePlayers;
+    for (int i = 0; i < GameSettings::instance().players; ++i) {
+        bool hasActiveCell = false;
+        for (auto& row : board) {
+            for (auto& cell : row) {
+                if (cell.player == &players[i] && cell.level > 0) {
+                    hasActiveCell = true;
+                    break;
+                }
+            }
+            if (hasActiveCell) break;
+        }
+        if (hasActiveCell) {
+            newActivePlayers.push_back(&players[i]); // Player has active cells, keep them active
+        } else {
+            newInactivePlayers.push_back(&players[i]); // Player has no active cells, move to inactive
+        }
+    }
+    activePlayers = newActivePlayers; // Update active players list
+    inactivePlayers = newInactivePlayers; // Update inactive players list
+    if(activePlayers.size() == 1) gameOver = true; // Game ends if only one player has active cells
+    
+    
 }

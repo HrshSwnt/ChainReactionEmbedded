@@ -36,13 +36,16 @@ bool GameCell::reset() {
 void GameCell::explode(GamePlayer* p){
     player = p; // Set player number if cell is empty
     level++;
+    GameBoard::instance().GameEndCheck();
     if (reset()){
         GameFrameQueue::instance().addFrame({
             GameCursor::instance().getX(),
             GameCursor::instance().getY(),
             p->id,
             GameBoard::instance().getColors(),
-            GameBoard::instance().getLevels()
+            GameBoard::instance().getLevels(),
+            GameBoard::instance().inactivePlayers, // List of eliminated players
+            GameBoard::instance().gameOver // Flag to indicate if the game is over
         }); // Add frame to the queue
         // If the cell was reset, notify neighbors
         for (GameCell* neighbor : neighbors) {
@@ -63,7 +66,9 @@ bool GameCell::select(GamePlayer* p) {
             GameCursor::instance().getY(),
             p->id,
             GameBoard::instance().getColors(),
-            GameBoard::instance().getLevels()
+            GameBoard::instance().getLevels(),
+            GameBoard::instance().inactivePlayers, // List of eliminated players
+            GameBoard::instance().gameOver // Flag to indicate if the game is over
         }); // Add frame to the queue
     } else if (player == p) {
         level++; // Increase level if the same player selects again
@@ -73,7 +78,9 @@ bool GameCell::select(GamePlayer* p) {
                 GameCursor::instance().getY(),
                 p->id,
                 GameBoard::instance().getColors(),
-                GameBoard::instance().getLevels()
+                GameBoard::instance().getLevels(),
+                GameBoard::instance().inactivePlayers, // List of eliminated players
+                GameBoard::instance().gameOver // Flag to indicate if the game is over
             }); // Add frame to the queue
             // If the cell was reset, notify neighbors
             for (GameCell* neighbor : neighbors) {

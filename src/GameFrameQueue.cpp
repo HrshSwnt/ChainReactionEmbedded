@@ -84,6 +84,16 @@ void drawGameFrame(const GameFrame& frame) {
     }
     cout << "═══╝" << endl;
     cout << "Player " << currentPlayer << "'s turn." << endl;
+    if (!frame.eliminatedPlayers.empty()) {
+        cout << "Eliminated Players: ";
+        for (const auto& player : frame.eliminatedPlayers) {
+            cout << "Player " << player->id << " (" << player->color << ") " << endl;
+        }
+        cout << endl;
+    }
+    if (frame.gameOver) {
+        cout << "Game Over! Player " << frame.eliminatedPlayers[0]->id << " wins!" << endl;
+    }
 }
 
 GameFrame createGameFrame() {

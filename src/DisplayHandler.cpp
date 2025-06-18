@@ -58,7 +58,9 @@ void DisplayThread::run() {
                 GameCursor::instance().getY(),
                 GameBoard::instance().getCurrentPlayer()->id,
                 GameBoard::instance().getColors(),
-                GameBoard::instance().getLevels()
+                GameBoard::instance().getLevels(),
+                GameBoard::instance().inactivePlayers, // List of eliminated players
+                GameBoard::instance().gameOver // Flag to indicate if the game is over
             });
         }
     }

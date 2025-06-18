@@ -75,9 +75,17 @@ public:
     GamePlayer* getCurrentPlayer();
     vector<vector<string>> getColors() const;
     vector<vector<int>> getLevels() const;
+    void GameEndCheck();
 
     vector<vector<GameCell>> board;
     vector<GamePlayer> players;
+    vector<GamePlayer*> activePlayers;
+    vector<GamePlayer*> inactivePlayers;
+    int rows;
+    int cols;
+    bool initialized;
+    bool firstRun;
+    bool gameOver;
 
 private:
     GameBoard();
@@ -88,10 +96,7 @@ private:
     GameBoard(GameBoard&&) = delete;
     GameBoard& operator=(GameBoard&&) = delete;
 
-    int rows;
-    int cols;
     int currentPlayer;
-    bool initialized;
 };
 
 // GameCursor singleton
@@ -187,6 +192,8 @@ struct GameFrame {
     int currentPlayerId;
     vector<vector<string>> colors;
     vector<vector<int>> levels;
+    vector<GamePlayer*> eliminatedPlayers; // List of eliminated players
+    bool gameOver; // Flag to indicate if the game is over
 };
 
 class GameFrameQueue{
