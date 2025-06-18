@@ -16,7 +16,6 @@ void setRawMode(bool enable) {
 }
 
 int main() {
-    setRawMode(true); // Set terminal to raw mode for immediate input handling
     // Initialize game settings
     GameSettings::instance().initializeFromInput();
     system("clear"); // Clear the console screen
@@ -26,24 +25,32 @@ int main() {
     cout << "Columns: " << GameSettings::instance().cols << endl;
     cout << "Players: " << GameSettings::instance().players << endl;
 
+    setRawMode(true); // Set terminal to raw mode for immediate input handling
     // Initialize the game board and game cursor
     GameCursor::instance().init();
-    GameBoard::instance().initialize(GameSettings::instance().rows, GameSettings::instance().cols);
+    GameBoard::instance().initialize(GameSettings::instance().rows, GameSettings::instance().cols, GameSettings::instance().players);
     
     cout << "Game board initialized." << endl;
+    cout << "Game players initialized." << endl;
+    for (GamePlayer& player : GameBoard::instance().players) {
+        cout << "Player " << player.id << " (" << player.color << ") initialized." << endl;
+    }
     cout << "Press any key to start the game..." << endl;
     cin.get(); // Wait for user input to start the game
     system("clear"); // Clear the console screen
 
-    int currentPlayer = 1; // Start with player 1
+    
 
     while (true)
     {
         system("clear"); // Clear the console screen
-        GameBoard::instance().drawGrid(GameCursor::instance().getX(), GameCursor::instance().getY(), currentPlayer);
+        GameBoard::instance().drawGrid(GameCursor::instance().getX(), GameCursor::instance().getY() );
         char input;
         read(STDIN_FILENO, &input, 1); // Read a single character input without waiting for Enter key
         switch (input) {
+            case 'c':
+                system("clear"); // Clear the console screen
+                break;
             case 'w': // Move cursor up
                 GameCursor::instance().moveUp();
                 break;
@@ -56,20 +63,19 @@ int main() {
             case 'd': // Move cursor right
                 GameCursor::instance().moveRight();
                 break;
+            case '\n': // Select the cell at the cursor position
+                {
+                    int x = GameCursor::instance().getX();
+                    int y = GameCursor::instance().getY();
+                    if (GameBoard::instance().board[y][x].select(GameBoard::instance().getCurrentPlayer())) {
+                        GameBoard::instance().switchPlayer();
+                    }
+                }
+                break;
             case 'q': // Quit the game
                 cout << "Exiting game." << endl;
                 setRawMode(false); // Restore terminal settings before exiting
                 return 0;
-            case '\n': // Select the cell at the cursor position
-                {
-                    std::lock_guard<std::mutex> lock(GameBoard::mtx());
-                    int x = GameCursor::instance().getX();
-                    int y = GameCursor::instance().getY();
-                    if (GameBoard::instance().board[y][x].select(currentPlayer)) {
-                        currentPlayer = (currentPlayer % GameSettings::instance().players) + 1; // Switch to the next player
-                    }
-                }
-                break;
             default: ;
                 // ignore invalid input
                 // cout << "Invalid input. Use WASD to move, Q to quit." << endl;

@@ -14,11 +14,16 @@ mutex& GameBoard::mtx() {
 }
 
 
-void GameBoard::initialize(int r, int c) {
+void GameBoard::initialize(int r, int c, int p) {
     std::lock_guard<std::mutex> lock(GameBoard::mtx());
     if (!initialized) {
         rows = r;
         cols = c;
+        players.clear();
+        for (int i = 0; i < p; ++i) {
+            players.emplace_back(i + 1); // Create players with IDs starting from 1
+        }
+        currentPlayer = 1; // Start with the first player
         board.resize(rows, vector<GameCell>(cols, GameCell()));
         for (int i = 0; i < rows; ++i) {
             for (int j = 0; j < cols; ++j) {
@@ -34,7 +39,26 @@ void GameBoard::initialize(int r, int c) {
     }
 }
 
-void GameBoard::drawGrid(int x, int y, int player) {
+GamePlayer* GameBoard::getCurrentPlayer(){
+    std::lock_guard<std::mutex> lock(GameBoard::mtx());
+    if (!initialized) {
+        std::cerr << "GameBoard not initialized.\n";
+        return nullptr; // Return nullptr if not initialized
+    }
+    return &players[currentPlayer - 1]; // Return the current player
+}
+
+void GameBoard::switchPlayer() {
+    std::lock_guard<std::mutex> lock(GameBoard::mtx());
+    if (!initialized) {
+        std::cerr << "GameBoard not initialized.\n";
+        return;
+    }
+    currentPlayer = (currentPlayer % players.size()) + 1; // Switch to the next player
+}
+
+
+void GameBoard::drawGrid(int x, int y) {
     std::lock_guard<std::mutex> lock(GameBoard::mtx());
 
     if (!initialized) {
@@ -52,13 +76,16 @@ void GameBoard::drawGrid(int x, int y, int player) {
         cout << "║";
         for (int j = 0; j < cols; ++j) {
             if (i == y && j == x) {
-                cout << "\033[31m";
+                cout << "\033[93m";
             }
             cout << " ";
             if (board[i][j].player == 0)
                 cout << "█";
-            else
+            else {
+                cout << colorToEscapeCode(board[i][j].player->color); // Use player's color
                 cout << board[i][j].level;
+                cout << "\033[0m"; // Reset color
+            }
             if (i == y && j == x) {
                 cout << "\033[0m"; // Reset color
             }
@@ -81,5 +108,5 @@ void GameBoard::drawGrid(int x, int y, int player) {
         cout << "═══╩";
     }
     cout << "═══╝" << endl;
-    cout << "Player " << player << "'s turn." << endl;
+    cout << "Player " << currentPlayer << "'s turn." << endl;
 }

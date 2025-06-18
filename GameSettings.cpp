@@ -5,13 +5,13 @@ GameSettings::GameSettings() : rows(5), cols(5), players(2) {}
 GameSettings::~GameSettings() = default; // Default destructor
 
 GameSettings& GameSettings::instance() {
-    static GameSettings instance;  // Thread-safe in C++11+
+    static GameSettings instance; 
     return instance;
 }
 
 void GameSettings::initializeFromInput() {
     std::string input;
-    std::cout << "Enter game settings in the format rows(>4) cols(>4) players(>1): ";
+    std::cout << "Enter game settings in the format rows(>4) cols(>4) players(>1 & <7): ";
     std::getline(std::cin, input);
     std::vector<std::string> inputSettings;
     std::string temp;
@@ -40,7 +40,7 @@ void GameSettings::initializeFromInput() {
         int r = std::stoi(inputSettings[0]);
         int c = std::stoi(inputSettings[1]);
         int p = std::stoi(inputSettings[2]);
-        if (r > 4 && c > 4 && p > 1) {
+        if (r > 4 && c > 4 && p > 1 && p < 7) {
             rows = r;
             cols = c;
             players = p;

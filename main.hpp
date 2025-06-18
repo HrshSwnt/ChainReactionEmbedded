@@ -11,6 +11,18 @@ using namespace std;
 
 #pragma once
 
+class GamePlayer {
+public:
+    int id;
+    int score;
+    string color;
+    bool isActive;
+
+    GamePlayer(int id);
+
+};
+
+
 // GameSettings singleton
 class GameSettings {
 public:
@@ -35,7 +47,7 @@ private:
 // GameCell definition
 class GameCell {
 public:
-    int player;
+    GamePlayer* player;
     int level;
     int row;
     int col;
@@ -45,8 +57,8 @@ public:
     void init(int r, int c);
     void addNeighbor(GameCell* neighbor);
     bool reset();
-    void explode(int p);
-    bool select(int p);
+    void explode(GamePlayer* p);
+    bool select(GamePlayer* p);
 };
 
 // GameBoard singleton
@@ -55,10 +67,13 @@ public:
     static GameBoard& instance();
     static mutex& mtx();
 
-    void initialize(int r, int c);
-    void drawGrid(int x, int y, int player);
+    void initialize(int r, int c, int p);
+    void drawGrid(int x, int y);
+    void switchPlayer();
+    GamePlayer* getCurrentPlayer();
 
     vector<vector<GameCell>> board;
+    vector<GamePlayer> players;
 
 private:
     GameBoard();
@@ -71,6 +86,7 @@ private:
 
     int rows;
     int cols;
+    int currentPlayer;
     bool initialized;
 };
 
@@ -95,5 +111,8 @@ private:
     int y;
 };
 
+
+
 // Terminal raw mode utility
 void setRawMode(bool enable);
+string colorToEscapeCode(const string& color);

@@ -7,7 +7,8 @@ SRCS := main.cpp \
 		 GameBoard.cpp \
 		 GameSettings.cpp \
 		 GameCell.cpp \
-		 GameCursor.cpp
+		 GameCursor.cpp \
+		 GamePlayer.cpp \
 
 BUILD_DIR := build
 OBJS := $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.o))
@@ -16,7 +17,7 @@ all: $(TARGET)
 
 $(TARGET): $(OBJS)
 	$(CXX) $(CXXFLAGS) -o $@ $^
-	rm -rf $(BUILD_DIR)
+#rm -rf $(BUILD_DIR)
 
 $(BUILD_DIR)/%.o: %.cpp | $(BUILD_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
