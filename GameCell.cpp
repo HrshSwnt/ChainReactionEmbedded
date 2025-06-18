@@ -39,7 +39,7 @@ void GameCell::explode(GamePlayer* p){
     if (reset()){
         // If the cell was reset, notify neighbors
         for (GameCell* neighbor : neighbors) {
-            neighbor->explode(p); // Notify neighbors to explode
+            ExplosionQueue::instance().addExplosion(neighbor, p); // Add explosion to the queue
         }
     }
 }
@@ -56,7 +56,7 @@ bool GameCell::select(GamePlayer* p) {
         if (reset()) {
             // If the cell was reset, notify neighbors
             for (GameCell* neighbor : neighbors) {
-                neighbor->explode(p); // Notify neighbors to explode
+                ExplosionQueue::instance().addExplosion(neighbor, p); // Add explosion to the queue
             }
         }
     }

@@ -3,9 +3,11 @@ using namespace std;
 
 #include <iostream>
 #include <vector>
+#include <queue>
 #include <cstdlib>
 #include <thread>
 #include <mutex>
+#include <condition_variable>
 #include <termios.h>
 #include <unistd.h>
 
@@ -131,6 +133,53 @@ private:
     void run();
 };
 
+struct Explosion {
+    GameCell* cell;
+    GamePlayer* player;
+};
+
+class ExplosionQueue {
+public:
+    static ExplosionQueue& instance();
+    static mutex& mtx();
+    static condition_variable& cv();
+    void addExplosion(GameCell* cell, GamePlayer* player);
+    void processExplosions();
+    void clear();
+    queue<Explosion> explosionQueue;
+private:
+    ExplosionQueue();
+    ~ExplosionQueue();
+    ExplosionQueue(const ExplosionQueue&) = delete;
+    ExplosionQueue& operator=(const ExplosionQueue&) = delete;
+    ExplosionQueue(ExplosionQueue&&) = delete;
+    ExplosionQueue& operator=(ExplosionQueue&&) = delete;
+};
+
+
+
+class ExplosionProcessorThread {
+public:
+    static ExplosionProcessorThread& instance();
+    void start();
+    void stop();
+    void join();
+    void processExplosions();
+    bool isRunning() const;
+private:
+    ExplosionProcessorThread();
+    ~ExplosionProcessorThread();
+    ExplosionProcessorThread(const ExplosionProcessorThread&) = delete;
+    ExplosionProcessorThread& operator=(const ExplosionProcessorThread&) = delete;
+    ExplosionProcessorThread(ExplosionProcessorThread&&) = delete;
+    ExplosionProcessorThread& operator=(ExplosionProcessorThread&&) = delete;
+    
+    thread explosionThread;
+    bool running;
+    void run();
+};
+
+
 // Terminal raw mode utility
 void setRawMode(bool enable);
-string colorToEscapeCode(const string& color);
+string colorToEscapeCode(const string& color, bool cursor);

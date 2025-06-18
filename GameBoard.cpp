@@ -75,20 +75,14 @@ void GameBoard::drawGrid(int x, int y) {
     for (int i = 0; i < rows; ++i) {
         cout << "║";
         for (int j = 0; j < cols; ++j) {
-            if (i == y && j == x) {
-                cout << "\033[93m";
-            }
             cout << " ";
-            if (board[i][j].player == 0)
+            cout << colorToEscapeCode(board[i][j].player != NULL ? board[i][j].player->color : "Black", (i == y && j == x));
+            if (board[i][j].player == NULL)
                 cout << "█";
             else {
-                cout << colorToEscapeCode(board[i][j].player->color); // Use player's color
                 cout << board[i][j].level;
-                cout << "\033[0m"; // Reset color
             }
-            if (i == y && j == x) {
-                cout << "\033[0m"; // Reset color
-            }
+            cout << "\033[0m"; // Reset color
             cout << " ║";
             
         }

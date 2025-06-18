@@ -26,19 +26,29 @@ GamePlayer::GamePlayer(int id) : id(id), score(0), isActive(true) {
 
 }
 
-string colorToEscapeCode(const std::string& color) {
+string colorToEscapeCode(const std::string& color, bool cursor) {
+    string code;
+    if (cursor) {
+        code = "\033[47;"; // white background
+    } else {
+        code = "\033[40;"; // black background
+    }
     if (color == "Red") {
-        return "\033[31m"; // Red
+        return code + "31m"; // Red
     } else if (color == "Blue") {
-        return "\033[34m"; // Blue
+        return code + "34m"; // Blue
     } else if (color == "Green") {
-        return "\033[32m"; // Green
+        return code + "32m"; // Green
     } else if (color == "Yellow") {
-        return "\033[33m"; // Yellow
+        return code + "33m"; // Yellow
     } else if (color == "Cyan") {
-        return "\033[36m"; // Cyan
+        return code + "36m"; // Cyan
     } else if (color == "Magenta") {
-        return "\033[35m"; // Magenta
+        return code + "35m"; // Magenta
+    } else if (color == "Black" && !cursor) {
+        return code + "30m"; // Black
+    } else if (color == "Black" && cursor) {
+        return code + "37m"; // White
     } else {
         return "\033[0m"; // Default color
     }

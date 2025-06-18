@@ -40,6 +40,7 @@ int main() {
     system("clear"); // Clear the console screen
 
     DisplayThread::instance().start(); // Start the display thread
+    ExplosionProcessorThread::instance().start(); // Start the explosion processor thread
 
     while (true)
     {
@@ -74,6 +75,9 @@ int main() {
                 cout << "Exiting game." << endl;
                 DisplayThread::instance().stop(); // Stop the display thread
                 DisplayThread::instance().join(); // Wait for the display thread to finish
+                ExplosionProcessorThread::instance().stop(); // Stop the explosion processor thread
+                ExplosionProcessorThread::instance().join(); // Wait for the explosion processor thread to finish
+                ExplosionQueue::instance().clear(); // Clear the explosion queue
                 system("clear"); // Clear the console screen
                 cout << "Game ended." << endl;
                 cout << "Thank you for playing!" << endl;
