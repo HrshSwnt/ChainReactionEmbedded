@@ -54,11 +54,8 @@ void ExplosionProcessorThread::processExplosions() {
     if (!ExplosionQueue::instance().explosionQueue.empty()) {
         Explosion exp = ExplosionQueue::instance().explosionQueue.front(); // Get the first explosion from the queue
         ExplosionQueue::instance().explosionQueue.pop(); // Remove the explosion from the queue
-
         lock.unlock(); // Unlock the mutex before processing the explosion
-        exp.cell->explode(exp.player); // Process the explosion in the cell   
-        
-
+        exp.cell->explode(exp.player); // Process the explosion in the cell
     }
     
 }

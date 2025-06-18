@@ -76,8 +76,8 @@ void GameBoard::drawGrid(int x, int y) {
         cout << "║";
         for (int j = 0; j < cols; ++j) {
             cout << " ";
-            cout << colorToEscapeCode(board[i][j].player != NULL ? board[i][j].player->color : "Black", (i == y && j == x));
-            if (board[i][j].player == NULL)
+            cout << colorToEscapeCode(board[i][j].player != nullptr ? board[i][j].player->color : "Black", (i == y && j == x));
+            if (board[i][j].player == nullptr)
                 cout << "█";
             else {
                 cout << board[i][j].level;
@@ -103,4 +103,26 @@ void GameBoard::drawGrid(int x, int y) {
     }
     cout << "═══╝" << endl;
     cout << "Player " << currentPlayer << "'s turn." << endl;
+}
+
+vector<vector<string>> GameBoard::getColors() const {
+    std::lock_guard<std::mutex> lock(GameBoard::mtx());
+    vector<vector<string>> colors(rows, vector<string>(cols));
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            colors[i][j] = board[i][j].player ? board[i][j].player->color : "Black";
+        }
+    }
+    return colors;
+}
+
+vector<vector<int>> GameBoard::getLevels() const {
+    std::lock_guard<std::mutex> lock(GameBoard::mtx());
+    vector<vector<int>> levels(rows, vector<int>(cols));
+    for (int i = 0; i < rows; ++i) {
+        for (int j = 0; j < cols; ++j) {
+            levels[i][j] = board[i][j].level;
+        }
+    }
+    return levels;
 }

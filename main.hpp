@@ -73,6 +73,8 @@ public:
     void drawGrid(int x, int y);
     void switchPlayer();
     GamePlayer* getCurrentPlayer();
+    vector<vector<string>> getColors() const;
+    vector<vector<int>> getLevels() const;
 
     vector<vector<GameCell>> board;
     vector<GamePlayer> players;
@@ -179,7 +181,38 @@ private:
     void run();
 };
 
+struct GameFrame {
+    int cursorX;
+    int cursorY;
+    int currentPlayerId;
+    vector<vector<string>> colors;
+    vector<vector<int>> levels;
+};
+
+class GameFrameQueue{
+public:
+    static GameFrameQueue& instance();
+    static mutex& mtx();
+    static condition_variable& cv();
+    void addFrame(const GameFrame& frame);
+    GameFrame getNextFrame();
+    bool isEmpty() const;
+    void clear();
+
+private:
+    GameFrameQueue();
+    ~GameFrameQueue();
+    GameFrameQueue(const GameFrameQueue&) = delete;
+    GameFrameQueue& operator=(const GameFrameQueue&) = delete;
+    GameFrameQueue(GameFrameQueue&&) = delete;
+    GameFrameQueue& operator=(GameFrameQueue&&) = delete;
+
+    queue<GameFrame> frameQueue;
+};
+
 
 // Terminal raw mode utility
 void setRawMode(bool enable);
 string colorToEscapeCode(const string& color, bool cursor);
+void drawGameFrame(const GameFrame& frame);
+GameFrame createGameFrame(int cursorX, int cursorY, int currentPlayerId);

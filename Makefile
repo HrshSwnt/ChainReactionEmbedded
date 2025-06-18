@@ -1,7 +1,7 @@
 # Makefile for building "cre" from main.cpp
 
 CXX := g++
-CXXFLAGS := -Wall -Wextra
+CXXFLAGS := -Wall -Wextra -g 
 TARGET := cre
 SRCS := main.cpp \
 		 GameBoard.cpp \
@@ -12,6 +12,7 @@ SRCS := main.cpp \
 		 DisplayHandler.cpp \
 		 ExplosionHandler.cpp \
 		 ExplosionQueue.cpp \
+		 GameFrameQueue.cpp \
 
 BUILD_DIR := build
 OBJS := $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.o))
