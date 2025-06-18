@@ -9,6 +9,7 @@ SRCS := main.cpp \
 		 GameCell.cpp \
 		 GameCursor.cpp \
 		 GamePlayer.cpp \
+		 DisplayHandler.cpp \
 
 BUILD_DIR := build
 OBJS := $(addprefix $(BUILD_DIR)/, $(SRCS:.cpp=.o))

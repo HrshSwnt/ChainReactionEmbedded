@@ -29,7 +29,7 @@ int main() {
     // Initialize the game board and game cursor
     GameCursor::instance().init();
     GameBoard::instance().initialize(GameSettings::instance().rows, GameSettings::instance().cols, GameSettings::instance().players);
-    
+
     cout << "Game board initialized." << endl;
     cout << "Game players initialized." << endl;
     for (GamePlayer& player : GameBoard::instance().players) {
@@ -39,12 +39,10 @@ int main() {
     cin.get(); // Wait for user input to start the game
     system("clear"); // Clear the console screen
 
-    
+    DisplayThread::instance().start(); // Start the display thread
 
     while (true)
     {
-        system("clear"); // Clear the console screen
-        GameBoard::instance().drawGrid(GameCursor::instance().getX(), GameCursor::instance().getY() );
         char input;
         read(STDIN_FILENO, &input, 1); // Read a single character input without waiting for Enter key
         switch (input) {
@@ -74,6 +72,11 @@ int main() {
                 break;
             case 'q': // Quit the game
                 cout << "Exiting game." << endl;
+                DisplayThread::instance().stop(); // Stop the display thread
+                DisplayThread::instance().join(); // Wait for the display thread to finish
+                system("clear"); // Clear the console screen
+                cout << "Game ended." << endl;
+                cout << "Thank you for playing!" << endl;
                 setRawMode(false); // Restore terminal settings before exiting
                 return 0;
             default: ;

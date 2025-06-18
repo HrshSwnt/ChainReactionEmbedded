@@ -111,7 +111,25 @@ private:
     int y;
 };
 
+class DisplayThread{
+public:
+    static DisplayThread& instance();
+    void start();
+    void stop();
+    void join();
+    bool isRunning() const;
 
+private:
+    DisplayThread();
+    ~DisplayThread();
+    DisplayThread(const DisplayThread&) = delete;
+    DisplayThread& operator=(const DisplayThread&) = delete;
+    DisplayThread(DisplayThread&&) = delete;
+    DisplayThread& operator=(DisplayThread&&) = delete;
+    thread displayThread;
+    bool running;
+    void run();
+};
 
 // Terminal raw mode utility
 void setRawMode(bool enable);
